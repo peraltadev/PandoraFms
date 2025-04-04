@@ -10,6 +10,10 @@ $email = $_POST['email'] ?? '';
 if (empty($name) || empty($dni) || empty($phone) || empty($email)) {
     die('All fields are required.');
 }
+if(!validateDNI($dni)) {
+    header('Location: index.php?error=Dni%20incorrecto');
+    exit;
+}
 
 // Verificar si el paciente ya existe
 $stmt = $pdo->prepare('SELECT id FROM patient WHERE dni = ?');
@@ -28,7 +32,6 @@ if ($patient) {
 // Obtener la última cita registrada
 try {
     $pdo->beginTransaction();
-
     // Seleccionamos la última cita y bloqueamos la fila hasta que terminemos la transacción
     $stmt = $pdo->query('SELECT date FROM appointment ORDER BY date DESC LIMIT 1 FOR UPDATE');
     $lastAppointment = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -55,7 +58,9 @@ try {
 
     $pdo->commit();
 
-    echo "Appointment successfully created for: " . $nextDateTime->format('Y-m-d H:i:s');
+    header('Location: index.php?success=1');
+    exit;
+
 
 } catch (Exception $e) {
     if ($pdo->inTransaction()) {
@@ -64,3 +69,18 @@ try {
 
     die("Error: " . $e->getMessage());
 }
+
+
+function validateDNI($dni) {
+    $dni = strtoupper($dni);
+    if (!preg_match('/^[0-9]{8}[A-Z]$/', $dni)) {
+        return false;
+    }
+
+    $number = intval(substr($dni, 0, 8));
+    $letter = substr($dni, -1);
+    $letters = 'TRWAGMYFPDXBNJZSQVHLCKE';
+
+    return $letter === $letters[$number % 23];
+}
+
