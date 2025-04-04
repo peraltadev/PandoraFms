@@ -1,6 +1,6 @@
 # Prueba técnica - Pandora
 
-Este proyecto es la resolución completa de la prueba técnica de desarrollo, que consta de dos ejercicios: un script de decodificación de puntuaciones de juego y una mini aplicación PHP para gestionar reservas online de una clínica de psicología.
+Este proyecto es la resolución completa de la prueba técnica de desarrollo, que consta de dos ejercicios: un script de decodificación de puntuaciones de juego y una mini aplicación PHP para gestionar reservas de citas.
 
 ## Explicación general
 
