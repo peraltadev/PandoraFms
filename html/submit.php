@@ -8,9 +8,11 @@ $email = $_POST['email'] ?? '';
 
 // Validación básica
 if (empty($name) || empty($dni) || empty($phone) || empty($email)) {
-    die('All fields are required.');
+    header('Location: index.php?error=Faltan%20campos%20obligatorios');
+    exit;
 }
-if(!validateDNI($dni)) {
+
+if (!validateDNI($dni)) {
     header('Location: index.php?error=Dni%20incorrecto');
     exit;
 }
@@ -29,7 +31,6 @@ if ($patient) {
     $patientId = $pdo->lastInsertId();
 }
 
-// Obtener la última cita registrada
 try {
     $pdo->beginTransaction();
     // Seleccionamos la última cita y bloqueamos la fila hasta que terminemos la transacción
@@ -39,7 +40,7 @@ try {
     if ($lastAppointment) {
         $lastDateTime = new DateTime($lastAppointment['date']);
     } else {
-        // Si no hay citas, empezamos hoy a las 10:00
+        // Si no hay citas, ponemos la hora a las 9 porque siempre sumamos 1hora
         $lastDateTime = new DateTime();
         $lastDateTime->setTime(9, 0);
     }
@@ -61,7 +62,6 @@ try {
     header('Location: index.php?success=1');
     exit;
 
-
 } catch (Exception $e) {
     if ($pdo->inTransaction()) {
         $pdo->rollBack();
@@ -70,6 +70,8 @@ try {
     die("Error: " . $e->getMessage());
 }
 
+
+// Función para validar el DNI español  
 
 function validateDNI($dni) {
     $dni = strtoupper($dni);
@@ -83,4 +85,3 @@ function validateDNI($dni) {
 
     return $letter === $letters[$number % 23];
 }
-
